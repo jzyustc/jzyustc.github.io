@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>DCVC-RT : Towards Practical Real-Time Neural Video Compression</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style" type="text/css" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#157878">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Responsive video style */
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .video-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Thumbnails bar style */
+        .thumbnails-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            position: relative;
+            width: 240px; /* Adjust width to fit 3 thumbnails */
+            margin: 0 auto;
+        }
+
+        .thumbnails-bar .thumbnail {
+            width: 80px;
+            height: 45px;
+            margin: 0 10px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .thumbnails-bar .thumbnail:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Active thumbnail style */
+        .active-thumbnail {
+            opacity: 1;
+            transform: scale(1.2);
+            border: 3px solid #157878;
+        }
+
+        .nav-buttons {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 10px;
+        }
+
+        .nav-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .nav-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+
+<body>
+<header class="page-header" role="banner">
+    <h1>DCVC-RT: Towards Practical Real-Time Neural Video Compression</h1>
+    <p style="font-size: 1.2em;">Zhaoyang Jia<sup>*1</sup>, Bin Li<sup>2</sup>, Jiahao Li<sup>2</sup>, Wenxuan Xie<sup>2</sup>, Linfeng Qi<sup>*1</sup>, Houqiang Li<sup>1</sup>, Yan Lu<sup>2</sup></p>
+    <p style="font-size: 1.2em;"><sup>1</sup>University of Science and Technology of China, <sup>2</sup>Microsoft Research Asia</p>
+    <p style="font-size: 1.2em; color: #555;">CVPR 2025</p>
+    <p>
+        <span><a href="https://arxiv.org/abs/2502.20762"><img src="https://img.shields.io/badge/arXiv-2502.20762-b31b1b.svg" alt="arXiv" /></a></span>
+        <span><a href="https://github.com/microsoft/DCVC"><img src="https://img.shields.io/badge/GitHub-DCVC-181717.svg" alt="GitHub" /></a></span>
+        <span><a href="#citation"><img src="https://img.shields.io/badge/Citation-BibTeX-007ec6.svg" alt="Citation" /></a></span>
+    </p>
+</header>
+
+
+<main id="content" class="main-content" role="main">
+
+<h2 id="overview">Overview</h2>
+
+<p><img src="assets/practical_performance.png"/></p>
+
+<p>DCVC-RT is the first neural video codec (NVC) achieving <strong> 100+ FPS 1080p coding and 4K real-time coding with a comparable compression ratio with ECM.</strong> 
+  Beyond high compression ratio and fast coding speed, the primary goal of DCVC-RT is to pursue a more practical neural video codec solution. Currently, DCVC-RT supports several practical features, including:</p>
+<ul>
+  <li><strong>Wide bitrate range in single model</strong>: A single model enables continuous and controllable bitrate adjustments. DCVC-RT can compress at a wide bitrate range for different coding scenarios. </li>
+  <li><strong>Rate control</strong>: By adjusting quantization parameters, DCVC-RT effectively supports dynamic and various network conditions during real communication scenario.</li>
+  <li><strong>Unified YUV and RGB coding</strong>: While DCVC-RT is primarily optimized for the widely adopted YUV format, it can seamlessly adapt to RGB content coding.</li>
+</ul>
+
+<p>
+    Here, we present a visual comparison between DCVC-RT (left) and the real-time GPU-accelerated traditional codec, NVEnc-HEVC (right), 
+    using the MCL-JCV video sequences. DCVC-RT demonstrates significantly superior visual quality. 
+    Click on the thumbnails to switch between visual examples.
+</p>
+
+
+<!-- Thumbnails bar -->
+<br>
+<p class="thumbnails-bar" id="thumbnailsBar">
+    <img src="assets/sr15.jpg" class="thumbnail" id="thumb0" onclick="changeVideo(0)">
+    <img src="assets/sr12.jpg" class="thumbnail" id="thumb1" onclick="changeVideo(1)">
+    <img src="assets/sr18.jpg" class="thumbnail" id="thumb2" onclick="changeVideo(2)">
+    <img src="assets/sr25.jpg" class="thumbnail" id="thumb3" onclick="changeVideo(3)">
+    <img src="assets/sr27.jpg" class="thumbnail" id="thumb4" onclick="changeVideo(4)">
+</p>
+
+<!-- Video container -->
+<br>
+<div class="video-container">
+    <video id="videoPlayer" controls loop>
+        <source src="assets/videoSRC15_1920x1080_30.yuv_qp_19_51.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="changeVideo('previous')">&#8249;</button>
+        <button class="nav-button" onclick="changeVideo('next')">&#8250;</button>
+    </div>
+</div>
+
+<p style="text-align: center;">Please expand the video to at least 1080p for better clarity and contrast.</p>
+
+<br>
+
+
+<h2 id="abstract">Abstract</h2>
+
+<p>We introduce a practical real-time neural video codec (NVC) designed to deliver high compression ratio, low latency and broad versatility. In practice, the coding speed of NVCs depends on 1) computational costs, and 2) non-computational operational costs, such as memory I/O and the number of function calls. While most efficient NVCs prioritize reducing computational cost, we identify operational cost as the primary bottleneck to achieving higher coding speed. Leveraging this insight, we introduce a set of efficiency-driven design improvements focused on minimizing operational costs. Specifically, we employ implicit temporal modeling to eliminate complex explicit motion modules, and use single low-resolution latent representations rather than progressive downsampling. These innovations significantly accelerate NVC without sacrificing compression quality. Additionally, we implement model integerization for consistent cross-device coding and a module-bank-based rate control scheme to improve practical adaptability. Experiments show our proposed DCVC-RT achieves an impressive average encoding/decoding speed at 125.2/112.8 fps (frames per second) for 1080p video, while saving an average of 21% in bitrate compared to H.266/VTM.</p>
+
+
+<h2 id="methods">Methods</h2>
+
+To accelerate NVCs, we rethink the complexity problem in this paper. In practice, both <strong>computational complexity</strong> (typically measured by the number of multiply-accumulate operations, MACs) 
+and <strong>operational complexity</strong> (e.g., function calls and memory I/O costs) influence the actual coding speed.
+While most existing research focuses on computational costs, our experiments illustrate that operational overhead is the primary bottleneck in accelerating NVCs. 
+This insight motivates us to design an NVC that minimizes operational costs.
+
+<p><img src="assets/method.png"/></p>
+
+To reduce operational complexity, we first employ <strong>implicit temporal modeling</strong> to eliminate complex explicit motion modules, reducing the number of modules.
+Additionally, we use a <strong>single low-resolution latent representation</strong> instead of progressive downsampling to lower memory I/O costs.
+These designs significantly simplify our NVC, effectively reducing operational costs and improving speed.
+
+<p><img src="assets/framework.png"/></p>
+
+
+
+<h2 id="video-compression-performance">Video Compression Performance</h2>
+<p>Bit saving over VTM-17.0 (UVG all frames with single intra-frame setting (i.e. intra-period = –1) and YUV420 colorspace.)</p>
+
+<p><img src="assets/RD-Curve.png"/></p>
+
+<p>The BD-Rate and 1080p encoding/decoding speed on NVIDIA A100 GPU</p>
+
+<p><img src="assets/bd_rate_speed.png"/></p>
+
+<p>The complexity analysis and encoding/decoding speed evaluation across various resolutions and devices.</p>
+
+<p><img src="assets/complexity.png"/></p>
+
+<h2 id="image-compression-performance">Image Compression Performance</h2>
+
+<p>Notably, the intra-frame codec in DCVC-RT also delivers impressive performance. On Kodak, DCVC-RT-Intra achieves an 11.1% bitrate reduction compared to VTM, with a over 10× faster decoding speed than previous state-of-the-art learned image codecs. For encoding, DCVC-RT-Intra also offers a similar speed advantage. For 1080p content, DCVC-RT-Intra achieves an impressive encoding/decoding speed of 40.7 FPS / 44.2 FPS on an NVIDIA A100 GPU.</p>
+
+<p><img src="assets/intra_compare.png" width="500" /></p>
+
+<h2 id="citation">Citation</h2>
+<p>If you find this work useful for your research, please cite:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@inproceedings{jia2025towards,
+  title={Towards Practical Real-Time Neural Video Compression},
+  author={Jia, Zhaoyang and Li, Bin and Li, Jiahao and Xie, Wenxuan and Qi, Linfeng and Li, Houqiang and Lu, Yan},
+  booktitle={{IEEE/CVF} Conference on Computer Vision and Pattern Recognition,
+            {CVPR 2025}, Nashville, TN, USA, June 11-25, 2024},
+  year={2025}
+}
+</code></pre></div></div>
+
+</main>
+
+<footer style="text-align: center; font-size: 1em; color: #777;">
+    <p><sup>*</sup> This work was done when Zhaoyang Jia and Linfeng Qi were full-time interns at Microsoft Research Asia.</p>
+</footer>
+
+<script>
+  const videos = [
+      { src: "assets/videoSRC15_1920x1080_30.yuv_qp_19_51.mp4", thumbnail: "assets/sr15.jpg" },
+      { src: "assets/videoSRC12_1920x1080_30.yuv_qp_13_51.mp4", thumbnail: "assets/sr12.jpg" },
+      { src: "assets/videoSRC18_1920x1080_25.yuv_qp_12_51.mp4", thumbnail: "assets/sr18.jpg" },
+      { src: "assets/videoSRC25_1920x1080_24.yuv_qp_16_51.mp4", thumbnail: "assets/sr25.jpg" },
+      { src: "assets/videoSRC27_1920x1080_30.yuv_qp_17_51.mp4", thumbnail: "assets/sr27.jpg" },
+  ];
+
+  let currentVideoIndex = 0;
+  const videoPlayer = document.getElementById('videoPlayer');
+  const thumbnailsBar = document.getElementById('thumbnailsBar');
+  const thumbnails = document.querySelectorAll('.thumbnail');
+
+  function changeVideo(direction) {
+      if (direction === 'next') {
+          currentVideoIndex = (currentVideoIndex + 1) % videos.length;
+      } else if (direction === 'previous') {
+          currentVideoIndex = (currentVideoIndex - 1 + videos.length) % videos.length;
+      } else {
+          currentVideoIndex = direction;
+      }
+
+      videoPlayer.src = videos[currentVideoIndex].src;
+      videoPlayer.load();
+      videoPlayer.play();
+
+      // Update the thumbnails visually without changing their order
+      updateThumbnails();
+  }
+
+  function updateThumbnails() {
+      // Shift the thumbnails for visual effect
+      const thumbnailsArr = Array.from(thumbnails);
+      const newThumbnailsOrder = [
+        thumbnailsArr[(currentVideoIndex + 3) % 5],
+        thumbnailsArr[(currentVideoIndex + 4) % 5],
+        thumbnailsArr[(currentVideoIndex) % 5],
+        thumbnailsArr[(currentVideoIndex + 1) % 5],
+        thumbnailsArr[(currentVideoIndex + 2) % 5],
+      ];
+
+      newThumbnailsOrder.forEach((thumb, index) => {
+          thumbnailsBar.appendChild(thumb);
+      });
+
+      // Activate the current thumbnail
+      thumbnails.forEach((thumbnail, index) => {
+          thumbnail.classList.remove('active-thumbnail');
+          if (index === currentVideoIndex) {
+              thumbnail.classList.add('active-thumbnail');
+          }
+      });
+  }
+
+  // Initialize with the default video and thumbnail
+  updateThumbnails();
+</script>
+
+
+</body>
+</html>
